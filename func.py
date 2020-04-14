@@ -1,4 +1,4 @@
-#!/Users/heike/anaconda3/bin/python
+#!/root/anaconda3/bin/python
 from __future__ import print_function
 import sys, os
 import argparse
@@ -21,16 +21,18 @@ def get_q1_val(step,idx,idxfix,dist):
     wout = 0.0 
     width = str(win)+","+str(wout)
     # stop criterium
-    thresh  = float(0.000005)  # height
+#   thresh  = float(0.0000050)  # height
+#   thresh  = float(0.000050)  # height
+    thresh  = float(0.000500)  # height
 #   collect output to check if necessary space has been covered
     foutput = "jval_q1.txt"
     f1 = open(foutput,"w")
 
     #start Q1
-    hlogic = True 
+    wlogic = True 
     i=1 
     valq1 = float(0.0)
-    while (hlogic == True):
+    while (wlogic == True):
         w1 = float(win -i*step)
         wi = f"{w1:.3f}"
         w2 = float(wout - (i-1)*step)
@@ -41,7 +43,7 @@ def get_q1_val(step,idx,idxfix,dist):
         flag = True 
         while (flag == True):
             h1 = float(hdown + (l-1)*step)
-            # store as strin with precicion .3
+            # store as string with precicion .3
             hd = f"{h1:.3f}"
             h2 = float(hup + l*step)
             hu = f"{h2:.3f}"
@@ -50,6 +52,7 @@ def get_q1_val(step,idx,idxfix,dist):
 #           print("width", width)
 
             jval = get_jval(idx,idxfix,dist,height,width)
+            sign3 = get_sign(jval)
 #           print("jval", jval)
             # get center point of pixel
             xyz = find_center() 
@@ -57,7 +60,29 @@ def get_q1_val(step,idx,idxfix,dist):
             # collect what we have to plot
             f1.write("%f %f %f %f \n" % (xyz[0],xyz[1],xyz[2],jval))
 
-            if (abs(float(jval)) <= thresh):
+            ht = float(hdown + l*step)
+            hdt = f"{ht:.3f}"
+            htt = float(hup + (l+1)*step)
+            hut = f"{htt:.3f}"
+            htemp = str(hdt)+","+str(hut)
+            jtmp = get_jval(idx,idxfix,dist,htemp,width)
+            sign4 = get_sign(jtmp)
+#           print("height", height)
+#           print("sign 3", sign3)
+#           print("htemp", htemp)
+#           print("sign 4", sign4)
+#           print("l", l)
+#           assume step 0.2 then 1 Angstroem buffer
+            if (l > 13) and (float(sign4) != float(sign3)):
+                print("inner loop if l block")
+                flag = False
+                break 
+            elif ((abs(float(jval))) <= thresh):
+                print("inner loop if jval block")
+                flag = False
+                break
+            elif (l > 28):
+                print("q1 l larger 28 exit loop")
                 flag = False
                 break
             # sum what we have
@@ -71,23 +96,35 @@ def get_q1_val(step,idx,idxfix,dist):
         jval1 = get_jval(idx,idxfix,dist,"0.0,0.1",width)
         sign1 = get_sign(jval1)
 #       print("after jval1" )
-#       print("height", "0.0,0.1")
-#       print("width", width)
-        # counter
-        i = i + 1
-        temp = str(win-(i-1)*step)+","+str(wout-i*step)
+        t1 = float(win-i*step)  
+        ti = f"{t1:.3f}"
+        t2 = float(wout-(i+1)*step)
+        to = f"{t2:.3f}"
+        temp = str(ti)+","+str(to)
+#       temp = str(win-(i-1)*step)+","+str(wout-i*step)
         jval2 = get_jval(idx,idxfix,dist,"0.0,0.1",temp)
         sign2 = get_sign(jval2)
 #       print("after jval2" )
-#       print("height", "0.0,0.1")
-#       print("width", temp)
+#       print("sign1", sign1) 
+#       print("sign2", sign2) 
+#       print("i", i) 
+#       print("l", l) 
+
         # stop criterium for width
-        if (float(sign2) != float(sign1)):
-            hlogic = False
+        if (i > 10) and (float(sign2) != float(sign1)):
+            print("I am in outer loop if sign block")
+            wlogic = False
             break 
-        elif (abs(val) < thresh):
-            hlogic = False
+        elif (abs(val) <= thresh):
+            print("I am in outer loop if abs val block")
+            wlogic = False
             break 
+        elif (i > 20):
+            print("q1 i lager 20 exit loop")
+            wlogic = False
+            break
+        # counter
+        i = i + 1
 
     print("valq1 final =", valq1) 
     f1.close()
@@ -104,16 +141,18 @@ def get_q2_val(step,idx,idxfix,dist):
     wout = 0.0 
     width = str(win)+","+str(wout)
     # stop criterium
-    thresh  = float(0.000005)  # height
+#   thresh  = float(0.0000050)  # height
+#   thresh  = float(0.000050)  # height
+    thresh  = float(0.000500)  # height
 #   collect output to check if necessary space has been covered
     foutput = "jval_q2.txt"
     f1 = open(foutput,"w")
 
     #start Q2
-    hlogic = True 
+    wlogic = True 
     i=1 
     valq2 = float(0.0)
-    while (hlogic == True):
+    while (wlogic == True):
         w1 = float(win -i*step)
         wi = f"{w1:.3f}"
         w2 = float(wout - (i-1)*step)
@@ -135,6 +174,7 @@ def get_q2_val(step,idx,idxfix,dist):
 #           print("width", width)
 
             jval = get_jval(idx,idxfix,dist,height,width)
+            sign3 = get_sign(jval)
 #           print("jval", jval)
             # get center point of pixel
             xyz = find_center() 
@@ -142,9 +182,34 @@ def get_q2_val(step,idx,idxfix,dist):
             # collect what we have to plot
             f1.write("%f %f %f %f \n" % (xyz[0],xyz[1],xyz[2],jval))
 
-            if (abs(float(jval)) <= thresh):
+            ht = float(hdown - l*step)
+            hdt = f"{ht:.3f}"
+            htt = float(hup - (l+1)*step)
+            hut = f"{htt:.3f}"
+            htemp = str(hdt)+","+str(hut)
+            jtmp = get_jval(idx,idxfix,dist,htemp,width)
+            sign4 = get_sign(jtmp)
+#           print("height", height)
+#           print("width", width)
+#           print("sign 3", sign3)
+#           print("htemp", htemp)
+#           print("sign 4", sign4)
+#           print("l", l)
+#           print("i", i)
+#           assume step 0.2 then 1 Angstroem buffer
+            if (l > 13) and (float(sign4) != float(sign3)):
+                print("inner loop if l block")
+                flag = False
+                break 
+            elif ((abs(float(jval))) <= thresh):
+                print("inner loop if jval block")
                 flag = False
                 break
+            elif (l > 28):
+                print("q2 l larger 28 exit loop")
+                flag = False
+                break 
+
             # sum what we have
             val = val + float(jval) 
 #           print("val", val)
@@ -155,18 +220,37 @@ def get_q2_val(step,idx,idxfix,dist):
         #
         jval1 = get_jval(idx,idxfix,dist,"-0.1,0.0",width)
         sign1 = get_sign(jval1)
-        # counter
-        i = i + 1
-        temp = str(win-(i-1)*step)+","+str(wout-i*step)
+
+        t1 = float(win- i*step)  
+        ti = f"{t1:.3f}"
+        t2 = float(wout-(i+1)*step)
+        to = f"{t2:.3f}"
+        temp = str(ti)+","+str(to)
+#       temp = str(win-(i-1)*step)+","+str(wout-i*step)
         jval2 = get_jval(idx,idxfix,dist,"-0.1,0.0",temp)
         sign2 = get_sign(jval2)
-        # stop criterium for width
-        if (float(sign2) != float(sign1)):
-            hlogic = False
+#       print("after jval2" )
+#       print("val", val )
+#       print("sign1", sign1) 
+#       print("sign2", sign2) 
+#       print("i", i)
+#       print("wlogic outer loop", wlogic)
+        # stop criterium for width is sign change
+        if (i > 10) and (float(sign2) != float(sign1)):
+            print("outer loop if sign block")
+            wlogic = False
             break 
-        elif (abs(val) < thresh):
-            hlogic = False
+        elif ((abs(float(val))) <= thresh):
+            print("outer loop if thresh block")
+            wlogic = False
             break 
+        elif (i > 20):
+            print("q2 i larger 20 exit loop")
+            wlogic = False
+            break 
+#       print("wlogic end outer loop", wlogic)
+#       counter
+        i = i + 1
 
     print("valq2 final =", valq2) 
     f1.close()
@@ -183,16 +267,18 @@ def get_q3_val(step,idx,idxfix,dist):
     wout = 0.0 
     width = str(win)+","+str(wout)
     # stop criterium
-    thresh  = float(0.000005)  # height and width
+#   thresh  = float(0.0000050)  # height
+#   thresh  = float(0.000050)  # height
+    thresh  = float(0.000500)  # height
 #   collect output to check if necessary space has been covered
     foutput = "jval_q3.txt"
     f1 = open(foutput,"w")
 
     #start Q3
-    hlogic = True 
+    wlogic = True 
     i=1 
     valq3 = float(0.0)
-    while (hlogic == True):
+    while (wlogic == True):
         w1 = float(win +i*step)
         wi = f"{w1:.3f}"
         w2 = float(wout + (i-1)*step)
@@ -212,42 +298,74 @@ def get_q3_val(step,idx,idxfix,dist):
 #           print("width", width)
 
             jval = get_jval(idx,idxfix,dist,height,width)
+            sign3 = get_sign(jval)
 #           print("jval", jval)
             # get center point of pixel
             xyz = find_center() 
 #           print("xyz", xyz )
             # collect what we have to plot
             f1.write("%f %f %f %f \n" % (xyz[0],xyz[1],xyz[2],jval))
+
+            ht = float(hdown + l*step)
+            hdt = f"{ht:.3f}"
+            htt = float(hup + (l+1)*step)
+            hut = f"{htt:.3f}"
+            htemp = str(hdt)+","+str(hut)
+            jtmp = get_jval(idx,idxfix,dist,htemp,width)
+            sign4 = get_sign(jtmp)
+#           print("height", height)
+#           print("sign 3", sign3)
+#           print("htemp", htemp)
+#           print("sign 4", sign4)
+#           print("l", l)
+#           assume step 0.2 then 1 Angstroem buffer
+            if (l > 13) and (float(sign4) != float(sign3)):
+#               print("inner loop if l block")
+                flag = False
+                break 
+            elif ((abs(float(jval))) <= thresh):
+#               print("inner loop if jval block")
+                flag = False
+                break
+            elif (l > 28):
+                print("q3 l larger 28 exit loop")
+                flag = False
+                break
+
             # sum what we have
             val = val + float(jval) 
 #           print("val", val)
-
-            if (abs(float(jval)) <= thresh):
-                flag = False
-                break
             l = l + 1 
     
         valq3 = valq3 + val 
-        print("val Q3 ", valq3) 
+#       print("val Q3 ", valq3) 
         #
 #       print("width ", width)
         jval1 = get_jval(idx,idxfix,dist,"0.0,0.1",width)
         sign1 = get_sign(jval1)
 #       print("sign1", sign1)
-        # counter
-        i = i + 1
-        temp = str(wout+ (i-1)*step)+","+str(win + i*step)
+        t1 = float(wout + i*step)  
+        ti = f"{t1:.3f}"
+        t2 = float(win + (i+1)*step)
+        to = f"{t2:.3f}"
+        temp = str(ti)+","+str(to)
+#       temp = str(wout+ (i-1)*step)+","+str(win + i*step)
 #       print("temp ", temp)
         jval2 = get_jval(idx,idxfix,dist,"0.0,0.1",temp)
         sign2 = get_sign(jval2)
 #       print("sign2", sign2)
-        # stop criterium for width
-        if (float(sign2) != float(sign1)) and (temp != "0.1,0.2"):
-            hlogic = False
+        if (i > 10) and (float(sign2) != float(sign1)):
+            wlogic = False
             break 
-        elif (abs(val) < thresh):
-            hlogic = False
+        elif (abs(val) <= thresh):
+            wlogic = False
             break 
+        elif (i > 20):
+            print("q3 i larger 20 exit loop")
+            wlogic = False
+            break
+        # counter
+        i = i + 1
 
     print("valq3 final =", valq3) 
     f1.close()
@@ -264,16 +382,18 @@ def get_q4_val(step,idx,idxfix,dist):
     wout = 0.0 
     width = str(win)+","+str(wout)
     # stop criterium
-    thresh  = float(0.000005)  # height
+#   thresh  = float(0.0000050)  # height
+#   thresh  = float(0.000050)  # height
+    thresh  = float(0.000500)  # height
 #   collect output to check if necessary space has been covered
     foutput = "jval_q4.txt"
     f1 = open(foutput,"w")
 
     #start Q4
-    hlogic = True 
+    wlogic = True 
     i=1 
     valq4 = float(0.0)
-    while (hlogic == True):
+    while (wlogic == True):
         w1 = float(win +i*step)
         wi = f"{w1:.3f}"
         w2 = float(wout + (i-1)*step)
@@ -293,6 +413,7 @@ def get_q4_val(step,idx,idxfix,dist):
 #           print("width", width)
 
             jval = get_jval(idx,idxfix,dist,height,width)
+            sign3 = get_sign(jval)
 #           print("jval", jval)
             # get center point of pixel
             xyz = find_center() 
@@ -300,7 +421,29 @@ def get_q4_val(step,idx,idxfix,dist):
             # collect what we have to plot
             f1.write("%f %f %f %f \n" % (xyz[0],xyz[1],xyz[2],jval))
 
-            if (abs(float(jval)) <= thresh):
+            ht = float(hdown - l*step)
+            hdt = f"{ht:.3f}"
+            htt = float(hup - (l+1)*step)
+            hut = f"{htt:.3f}"
+            htemp = str(hdt)+","+str(hut)
+            jtmp = get_jval(idx,idxfix,dist,htemp,width)
+            sign4 = get_sign(jtmp)
+#           print("height", height)
+#           print("sign 3", sign3)
+#           print("htemp", htemp)
+#           print("sign 4", sign4)
+#           print("l", l)
+#           assume step 0.2 then 1 Angstroem buffer
+            if (l > 13) and (float(sign4) != float(sign3)):
+#               print("inner loop if l block")
+                flag = False
+                break 
+            elif ((abs(float(jval))) <= thresh):
+#               print("inner loop if jval block")
+                flag = False
+                break
+            elif (l > 28):
+                print("q4 l larger 28 exit loop")
                 flag = False
                 break
             # sum what we have
@@ -313,18 +456,27 @@ def get_q4_val(step,idx,idxfix,dist):
         #
         jval1 = get_jval(idx,idxfix,dist,"-0.1,0.0",width)
         sign1 = get_sign(jval1)
-        # counter
-        i = i + 1
-        temp = str(wout+ (i-1)*step)+","+str(win + i*step)
+        t1 = float(wout + i*step)  
+        ti = f"{t1:.3f}"
+        t2 = float(win + (i+1)*step)
+        to = f"{t2:.3f}"
+        temp = str(ti)+","+str(to)
+#       temp = str(wout+ (i-1)*step)+","+str(win + i*step)
         jval2 = get_jval(idx,idxfix,dist,"-0.1,0.0",temp)
         sign2 = get_sign(jval2)
         # stop criterium for width
-        if (float(sign2) != float(sign1)) and (temp != "0.1,0.2"):
-            hlogic = False
+        if (i > 10) and (float(sign2) != float(sign1)):
+            wlogic = False
             break 
-        elif (abs(val) < thresh):
-            hlogic = False
+        elif (abs(val) <= thresh):
+            wlogic = False
             break 
+        elif (i > 20):
+            print("q4 i larger 20 exit loop")
+            wlogic = False
+            break
+        # counter
+        i = i + 1
 
     print("valq4 final =", valq4) 
     f1.close()
@@ -351,6 +503,7 @@ def get_jval(idx,idxfix,dist,height,width):
     write_gimic_input(finput,idx,idxfix,dist,height,width)
     # run gimic
     os.system("gimic > gimic.out ")
+#   os.system("~/source/gimic/build/bin/gimic > gimic.out")
     # get output
     jval = find_j()
 #   print(jval)
@@ -412,8 +565,8 @@ def write_gimic_input(finput,idx,idxfix,dist,height,width):
     f1.write('xdens="XDENS" \n')
     f1.write("debug=1 \n")
     f1.write("openshell=false \n")
-#   f1.write("magnet=[0.0,0.0,1.0] \n")
-    f1.write("magnet_axis=X \n")
+    f1.write("magnet=[0.0,0.0,1.0] \n")
+#   f1.write("magnet_axis=X \n")
     f1.write("Grid(bond) { \n")
     f1.write("    type=gauss \n")
     # magnet_axis=X 
@@ -496,5 +649,4 @@ def get_dist(idx):
     # save 0.5 dist as gimic input in bohr
     halfdist_bohr = 0.5*dist*ang2bohr 
     return halfdist_bohr
-
 

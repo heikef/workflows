@@ -1,4 +1,4 @@
-#!/Users/heike/anaconda3/bin/python
+#!/root/anaconda3/bin/python
 from __future__ import print_function
 import sys, os
 import argparse
@@ -34,21 +34,26 @@ else:
     print("no fixatom set")
 
 dist = get_dist(idx)
-step = float(0.1)
+# step = float(0.1)
+# step = float(0.05)
+step = float(0.2)
 start = time.time()
 q1 = get_q1_val(step,idx,idxfix,dist) 
 q2 = get_q2_val(step,idx,idxfix,dist) 
 q3 = get_q3_val(step,idx,idxfix,dist) 
 q4 = get_q4_val(step,idx,idxfix,dist) 
+
 end = time.time()
 walltime = end -start  # in seconds
 j = float(q1 + q2 + q3 + q4) 
+
 print(" ")
-print("valq1 final =", q1) 
-print("valq2 final =", q2) 
-print("valq3 final =", q3) 
-print("valq4 final =", q4) 
-print("SUM", q1+q2+q3+q4) 
+print("valq1 final =", "%8.5f" %(q1) ) 
+print("valq2 final =", "%8.5f" %(q2) ) 
+print("valq3 final =", "%8.5f" %(q3) ) 
+print("valq4 final =", "%8.5f" %(q4) ) 
+print("SUM =        ", "%8.5f" %(j) ) 
+
 print(" ")
 print("wall time in seconds", walltime)
 print("wall time in minutes", float(walltime/60.0))
@@ -59,11 +64,12 @@ f1 = open(fout,"w")
 f1.write("bond atom 1 = "+ str(atom1) + "\n") 
 f1.write("bond atom 2 ="+ str(atom2) + "\n") 
 f1.write("fixpoint = "+ fixatom + "\n")
-f1.write("Q1 = "+ str(q1) + "\n")
-f1.write("Q2 = "+ str(q2) + "\n")
-f1.write("Q3 = "+ str(q3) + "\n")
-f1.write("Q4 = "+ str(q4) + "\n")
-f1.write("J  = "+ str(j ) + "\n")
+# f1.write("Q1 = "+ str(q1) + "\n")
+f1.write("Q1 = "+ f"{q1:.5f}" + "\n")
+f1.write("Q2 = "+ f"{q2:.5f}" + "\n")
+f1.write("Q3 = "+ f"{q3:.5f}" + "\n")
+f1.write("Q4 = "+ f"{q4:.5f}" + "\n")
+f1.write("J  = "+ f"{j:.5f}" + "\n")
 f1.close()
 
 
